@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Toss Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .coin {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: 5px solid #B8860B;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+        }
+        
+        .coin.flipping {
+            animation: flip 1s ease-in-out;
+        }
+        
+        @keyframes flip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg) scale(1.1); }
+            100% { transform: rotateY(0deg); }
+        }
+        
+        .choice-buttons {
+            margin: 30px 0;
+        }
+        
+        .choice-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .choice-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .choice-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin: 20px 0;
+            font-size: 24px;
+            min-height: 30px;
+        }
+        
+        .win {
+            color: #4CAF50;
+        }
+        
+        .lose {
+            color: #f44336;
+        }
+        
+        .control-buttons {
+            margin-top: 30px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 0 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-btn:hover {
+            background: linear-gradient(45deg, #1976D2, #2196F3);
+            transform: translateY(-2px);
+        }
+        
+        .quit-btn {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+        
+        .quit-btn:hover {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+        }
+        
+        .game-info {
+            margin: 20px 0;
+            color: #666;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🪙 Coin Toss Game</h1>
+        
+        <div class="coin" id="coin">
+            Ready?
+        </div>
+        
+        <div class="game-info">
+            Choose Heads or Tails, then watch the coin flip!
+        </div>
+        
+        <div class="choice-buttons">
+            <button class="choice-btn" id="headsBtn" onclick="makeChoice('heads')">
+                🗣️ HEADS
+            </button>
+            <button class="choice-btn" id="tailsBtn" onclick="makeChoice('tails')">
+                🦎 TAILS
+            </button>
+        </div>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="control-buttons">
+            <button class="control-btn" id="resetBtn" onclick="resetGame()">
+                🔄 Reset
+            </button>
+            <button class="control-btn quit-btn" id="quitBtn" onclick="quitGame()">
+                ❌ Quit
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let userChoice = '';
+        let isFlipping = false;
+        
+        function makeChoice(choice) {
+            if (isFlipping) return;
+            
+            userChoice = choice;
+            isFlipping = true;
+            
+            // Disable choice buttons
+            document.getElementById('headsBtn').disabled = true;
+            document.getElementById('tailsBtn').disabled = true;
+            
+            // Clear previous result
+            document.getElementById('result').innerHTML = '';
+            
+            // Start coin flip animation
+            const coin = document.getElementById('coin');
+            coin.classList.add('flipping');
+            coin.innerHTML = 'Flipping...';
+            
+            // After delay, show result
+            setTimeout(() => {
+                showResult();
+            }, 1500);
+        }
+        
+        function showResult() {
+            // Generate random result
+            const coinResult = Math.random() < 0.5 ? 'heads' : 'tails';
+            
+            // Update coin display
+            const coin = document.getElementById('coin');
+            coin.classList.remove('flipping');
+            coin.innerHTML = coinResult.toUpperCase();
+            
+            // Show win/lose result
+            const resultDiv = document.getElementById('result');
+            if (userChoice === coinResult) {
+                resultDiv.innerHTML = '<b class="win">🎉 YOU WIN! 🎉</b>';
+            } else {
+                resultDiv.innerHTML = '<b class="lose">😔 YOU LOSE! 😔</b>';
+            }
+            
+            // Re-enable choice buttons
+            document.getElementById('headsBtn').disabled = false;
+            document.getElementById('tailsBtn').disabled = false;
+            
+            isFlipping = false;
+        }
+        
+        function resetGame() {
+            userChoice = '';
+            isFlipping = false;
+            
+            // Reset coin display
+            const coin = document.getElementById('coin');
+            coin.classList.remove('flipping');
+            coin.innerHTML = 'Ready?';
+            
+            // Clear result
+            document.getElementById('result').innerHTML = '';
+            
+            // Enable choice buttons
+            document.getElementById('headsBtn').disabled = false;
+            document.getElementById('tailsBtn').disabled = false;
+        }
+        
+        function quitGame() {
+            if (confirm('Are you sure you want to quit the game?')) {
+                document.body.innerHTML = `
+                    <div style="
+                        display: flex; 
+                        justify-content: center; 
+                        align-items: center; 
+                        height: 100vh; 
+                        font-family: Arial, sans-serif; 
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        text-align: center;
+                    ">
+                        <div>
+                            <h1 style="font-size: 3em; margin-bottom: 20px;">👋</h1>
+                            <h2>Thanks for playing!</h2>
+                            <p>Refresh the page to play again.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
